@@ -5,12 +5,14 @@ class RouteTrie:
         self.root_node.handler = root_handler
 
     def insert(self, path_array, handler_to_insert):
-        # Similar to our previous example you will want to recursively add nodes
-        # Make sure you assign the handler to only the leaf (deepest) node of this path
+        # Traverse through the nodes of the RouteTrie starting from the root
         current_node = self.root_node
         for path_segment in path_array:
+            # Call insert for each path segment from the path array - it will be added if needed
             current_node.insert(path_segment)
+            # Continue the traversal for the next part of the path
             current_node = current_node.children[path_segment]
+        # Add the handler at the deepest node in the path (the leaf)
         current_node.handler = handler_to_insert
 
     def find(self, path_array):
@@ -24,16 +26,16 @@ class RouteTrie:
         return current_node.handler
 
 
-# A RouteTrieNode will be similar to our autocomplete TrieNode... with one additional element, a handler.
+# Represents a node (part of a path) within the RouteTrie
 class RouteTrieNode:
     def __init__(self, node_path):
-        # Initialize the node with children as before, plus a handler
+        # Initialize the node with children and a handler
         self.node_path = node_path
         self.children = {}
         self.handler = None
 
     def insert(self, path_segment):
-        # Insert the node as before
+        # Insert the child path segment if it doesn't already exist
         if path_segment not in self.children:
             self.children[path_segment] = RouteTrieNode(path_segment)
 
@@ -41,47 +43,42 @@ class RouteTrieNode:
 # The Router class will wrap the Trie and handle
 class Router:
     def __init__(self, root_handler, not_found_handler=None):
-        # Create a new RouteTrie for holding our routes
-        # You could also add a handler for 404 page not found responses as well!
+        # Create a new RouteTrie for holding our routes and define a "not found" handler
         self.routes = RouteTrie('/', root_handler)
         self.not_found_handler = not_found_handler
 
     def add_handler(self, path_to_add, handler_for_path):
         # Add a handler for a path
-        # You will need to split the path and pass the pass parts
-        # as a list to the RouteTrie
+        # Split the path and pass the path parts as a list to the RouteTrie
         path_segments = self.split_path(path_to_add)
         self.routes.insert(path_segments, handler_for_path)
 
     def lookup(self, path_to_lookup):
-        # lookup path (by parts) and return the associated handler
-        # you can return None if it's not found or
-        # return the "not found" handler if you added one
-        # bonus points if a path works with and without a trailing slash
-        # e.g. /about and /about/ both return the /about handler
+        # Lookup path (by parts) and return the associated handler
+        # Returns "not found" handler if path not found
         path_segments = self.split_path(path_to_lookup)
         lookup_result = self.routes.find(path_segments)
         if lookup_result is None:
             return self.not_found_handler
         return lookup_result
 
-    def split_path(self, path_to_split=''):
-        # you need to split the path into parts for
-        # both the add_handler and lookup functions,
-        # so it should be placed in a function here
+    def split_path(self, path_to_split='', path_delimiter="/"):
+        # Splits the provided path
+        # Returns an array with the segments of the path to be used by the add_handler and lookup functions
 
         # Removing specific leading and trailing character:
         # https://stackoverflow.com/questions/42026036/trim-specific-leading-and-trailing-characters-from-a-string
-        return path_to_split.rstrip("/").split("/")[1:]
+
+        # Removes the trailing "/" if it is present
+        return path_to_split.rstrip(path_delimiter).split(path_delimiter)[1:]
 
 
-# Here are some test cases and expected outputs you can use to test your implementation
 # Create the router and add a route
 router = Router("root handler",
                 "not found handler")  # remove the 'not found handler' if you did not implement this
 router.add_handler("/home/about", "about handler")  # add a route
 
-# some lookups with the expected output
+# Test Cases
 print(router.lookup("/"))  # should print 'root handler'
 print(router.lookup("/home"))  # should print 'not found handler' or None if you did not implement one
 print(router.lookup("/home/about"))  # should print 'about handler'
