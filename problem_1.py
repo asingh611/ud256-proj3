@@ -10,7 +10,7 @@ def sqrt(number, initial_guess=10):
        int: Floored Square Root
     """
 
-    # If input number is negative, return None
+    # If input number is negative, flip the sign (will return number to be multiplied by i)
     if number < 0:
         number = number * -1
 

@@ -1,0 +1,8 @@
+Problem 1
+In this problem, the floored square root of a number is found without using the built-in square root function. The expected time complexity is O(log(n)). In order to achieve this, binary search is used. In this case, we are doing a binary search along the number line. The inital lower bound is zero, because there are no negative values for the square root of a number. For the upper bound of the set of integers to perform the binary search on, there is an initial guess parameter that the user can use to give an approximation to the answer (default value is 10). 
+
+Next, the upper bound in increased as needed until the upper bound multiplied by itself is greater than the input number. The overall runtime of the algorithm is affected by how good of an initial guess is made. 
+
+Now that the upper bound is established, bisect the range until the midpoint multiplied by itself is equal to the input number, or there is only one number left, which would be the floored value.
+
+In terms of space complexity, I'm only storing some intermediate values for the bounds and current guess
